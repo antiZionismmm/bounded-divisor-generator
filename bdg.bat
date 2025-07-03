@@ -1,26 +1,24 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Input the total number
-set /p inputNumber="Enter a number: "
-
-REM Input the value of n
-set /p n="Enter the value of n: "
-
-REM Input min and max values
-set /p minVal="Enter minimum value for each number: "
-set /p maxVal="Enter maximum value for each number: "
+:main
+REM Input values
+set /p inputNumber="Total: "
+set /p n="Count: "
+set /p minVal="Min: "
+set /p maxVal="Max: "
 
 :retry
 set /a remainingNumber=%inputNumber%
 set divisors=
+set sum=0
+set min=999999
+set max=0
 
-REM Initialize array
 for /l %%i in (1,1,%n%) do (
     set "div[%%i]="
 )
 
-REM Fill each number with a random value within min and max
 for /l %%i in (1,1,%n%) do (
     set /a maxAllowed=%maxVal%
     if !remainingNumber! lss %maxVal% set /a maxAllowed=!remainingNumber!
@@ -32,18 +30,31 @@ for /l %%i in (1,1,%n%) do (
     set /a remainingNumber-=!randNum!
 )
 
-REM If leftover is not 0, retry
 if !remainingNumber! neq 0 goto retry
 
-REM Output result
 for /l %%i in (1,1,%n%) do (
-    set "divisors=!divisors!!div[%%i]!"
+    set "val=!div[%%i]!"
+    set /a sum+=val
+    if !val! lss !min! set /a min=val
+    if !val! gtr !max! set /a max=val
+    set "divisors=!divisors!!val!"
     if %%i lss %n% set "divisors=!divisors!,"
 )
 
-echo Divisors: !divisors!
+echo -----------------------------
+echo Numbers: !divisors!
+echo Sum: !sum!
+echo Min: !min!
+echo Max: !max!
+echo -----------------------------
 
+:menu
 echo.
-echo Press any key to close...
-pause > nul
-endlocal
+echo [1] Recalculate with same values
+echo [2] Enter new values
+echo [3] Exit
+set /p choice="Select: "
+if "%choice%"=="1" goto retry
+if "%choice%"=="2" goto main
+if "%choice%"=="3" exit
+goto menu
