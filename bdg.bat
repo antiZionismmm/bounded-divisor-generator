@@ -1,19 +1,52 @@
 @echo off
 setlocal enabledelayedexpansion
 
+color 07
+
 :main
-REM Input values
+cls
+echo === Bounded Divisor Generator ===
+echo.
+
 set /p inputNumber="Total: "
 set /p n="Count: "
 set /p minVal="Min: "
 set /p maxVal="Max: "
 
+REM Check if values make sense
+set /a minTotal=%minVal% * %n%
+set /a maxTotal=%maxVal% * %n%
+
+if %minTotal% gtr %inputNumber% (
+    color 4F
+    echo [ERROR] Total is too small for given min and count!
+    pause
+    color 07
+    goto main
+)
+if %maxTotal% lss %inputNumber% (
+    color 4F
+    echo [ERROR] Total is too large for given max and count!
+    pause
+    color 07
+    goto main
+)
+
 :retry
+cls
+echo Generating numbers
 set /a remainingNumber=%inputNumber%
 set divisors=
 set sum=0
 set min=999999
 set max=0
+
+REM Loading dots (fake processing)
+(for /L %%x in (1,1,15) do (
+    <nul set /p=.
+    ping -n 1 127.0.0.1 > nul
+)) > nul
+echo.
 
 for /l %%i in (1,1,%n%) do (
     set "div[%%i]="
@@ -41,12 +74,24 @@ for /l %%i in (1,1,%n%) do (
     if %%i lss %n% set "divisors=!divisors!,"
 )
 
-echo -----------------------------
+REM Output results
+cls
+echo ================================
 echo Numbers: !divisors!
+echo ----------------
 echo Sum: !sum!
 echo Min: !min!
 echo Max: !max!
-echo -----------------------------
+
+if !sum! equ %inputNumber% (
+    color 2F
+    echo [OK] ✅ Values calculated successfully!
+) else (
+    color 4F
+    echo [ERROR] ❌ Sum mismatch!
+)
+color 07
+echo ================================
 
 :menu
 echo.
